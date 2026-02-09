@@ -29,13 +29,13 @@ export const getInvestments = async (req: AuthRequest, res: Response) => {
       where: { userId, ...(area && { area }) },
     });
 
-    res.json({
+    return res.json({
       investments,
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     });
   } catch (error) {
     console.error('Get investments error:', error);
-    res.status(500).json({ error: 'Failed to fetch investments' });
+    return res.status(500).json({ error: 'Failed to fetch investments' });
   }
 };
 
@@ -72,26 +72,23 @@ export const createInvestment = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    // Update account totals
-    const account = await prisma.account.findUnique({ where: { userId } });
-    if (account) {
-      await prisma.account.update({
-        where: { userId },
-        data: {
-          totalInvested: {
-            increment: parsedAmount,
-          },
-          totalBalance: {
-            decrement: parsedAmount,
-          },
-        },
-      });
+    // Update account totals (create account if missing for existing users)
+    let account = await prisma.account.findUnique({ where: { userId } });
+    if (!account) {
+      account = await prisma.account.create({ data: { userId } });
     }
+    await prisma.account.update({
+      where: { userId },
+      data: {
+        totalInvested: { increment: parsedAmount },
+        totalBalance: { decrement: parsedAmount },
+      },
+    });
 
-    res.status(201).json(investment);
+    return res.status(201).json(investment);
   } catch (error) {
     console.error('Create investment error:', error);
-    res.status(500).json({ error: 'Failed to create investment' });
+    return res.status(500).json({ error: 'Failed to create investment' });
   }
 };
 
@@ -126,10 +123,10 @@ export const updateInvestment = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json(updated);
+    return res.json(updated);
   } catch (error) {
     console.error('Update investment error:', error);
-    res.status(500).json({ error: 'Failed to update investment' });
+    return res.status(500).json({ error: 'Failed to update investment' });
   }
 };
 
@@ -169,9 +166,9 @@ export const deleteInvestment = async (req: AuthRequest, res: Response) => {
 
     await prisma.investment.delete({ where: { id } });
 
-    res.json({ message: 'Investment deleted' });
+    return res.json({ message: 'Investment deleted' });
   } catch (error) {
     console.error('Delete investment error:', error);
-    res.status(500).json({ error: 'Failed to delete investment' });
+    return res.status(500).json({ error: 'Failed to delete investment' });
   }
 };

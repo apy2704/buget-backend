@@ -15,10 +15,10 @@ export const getCards = async (req: AuthRequest, res: Response) => {
       orderBy: { isDefault: 'desc' },
     });
 
-    res.json(cards);
+    return res.json(cards);
   } catch (error) {
     console.error('Get cards error:', error);
-    res.status(500).json({ error: 'Failed to fetch cards' });
+    return res.status(500).json({ error: 'Failed to fetch cards' });
   }
 };
 
@@ -95,10 +95,10 @@ export const createCard = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.status(201).json(card);
+    return res.status(201).json(card);
   } catch (error) {
     console.error('Create card error:', error);
-    res.status(500).json({ error: 'Failed to create card' });
+    return res.status(500).json({ error: 'Failed to create card' });
   }
 };
 
@@ -138,10 +138,10 @@ export const updateCard = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json(updated);
+    return res.json(updated);
   } catch (error) {
     console.error('Update card error:', error);
-    res.status(500).json({ error: 'Failed to update card' });
+    return res.status(500).json({ error: 'Failed to update card' });
   }
 };
 
@@ -165,9 +165,9 @@ export const deleteCard = async (req: AuthRequest, res: Response) => {
 
     await prisma.card.delete({ where: { id } });
 
-    res.json({ message: 'Card deleted' });
+    return res.json({ message: 'Card deleted' });
   } catch (error) {
     console.error('Delete card error:', error);
-    res.status(500).json({ error: 'Failed to delete card' });
+    return res.status(500).json({ error: 'Failed to delete card' });
   }
 };

@@ -29,13 +29,13 @@ export const getExpenses = async (req: AuthRequest, res: Response) => {
       where: { userId, ...(category && { category }) },
     });
 
-    res.json({
+    return res.json({
       expenses,
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     });
   } catch (error) {
     console.error('Get expenses error:', error);
-    res.status(500).json({ error: 'Failed to fetch expenses' });
+    return res.status(500).json({ error: 'Failed to fetch expenses' });
   }
 };
 
@@ -70,26 +70,23 @@ export const createExpense = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    // Update account totals
-    const account = await prisma.account.findUnique({ where: { userId } });
-    if (account) {
-      await prisma.account.update({
-        where: { userId },
-        data: {
-          totalExpense: {
-            increment: parsedAmount,
-          },
-          totalBalance: {
-            decrement: parsedAmount,
-          },
-        },
-      });
+    // Update account totals (create account if missing for existing users)
+    let account = await prisma.account.findUnique({ where: { userId } });
+    if (!account) {
+      account = await prisma.account.create({ data: { userId } });
     }
+    await prisma.account.update({
+      where: { userId },
+      data: {
+        totalExpense: { increment: parsedAmount },
+        totalBalance: { decrement: parsedAmount },
+      },
+    });
 
-    res.status(201).json(expense);
+    return res.status(201).json(expense);
   } catch (error) {
     console.error('Create expense error:', error);
-    res.status(500).json({ error: 'Failed to create expense' });
+    return res.status(500).json({ error: 'Failed to create expense' });
   }
 };
 
@@ -130,10 +127,10 @@ export const updateExpense = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json(updated);
+    return res.json(updated);
   } catch (error) {
     console.error('Update expense error:', error);
-    res.status(500).json({ error: 'Failed to update expense' });
+    return res.status(500).json({ error: 'Failed to update expense' });
   }
 };
 
@@ -173,9 +170,9 @@ export const deleteExpense = async (req: AuthRequest, res: Response) => {
 
     await prisma.expense.delete({ where: { id } });
 
-    res.json({ message: 'Expense deleted' });
+    return res.json({ message: 'Expense deleted' });
   } catch (error) {
     console.error('Delete expense error:', error);
-    res.status(500).json({ error: 'Failed to delete expense' });
+    return res.status(500).json({ error: 'Failed to delete expense' });
   }
 };

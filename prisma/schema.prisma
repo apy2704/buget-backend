@@ -158,6 +158,7 @@ model Budget {
   month         Int?       // for monthly budgets: 1-12
   year          Int?       // for tracking budget year
   alertThreshold Int       @default(80)  // percentage (0-100)
+  followed       Boolean?  // true = budget followed, false = not followed (user-marked)
   
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt

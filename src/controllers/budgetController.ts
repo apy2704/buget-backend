@@ -15,10 +15,10 @@ export const getBudgets = async (req: AuthRequest, res: Response) => {
       orderBy: { createdAt: 'desc' },
     });
 
-    res.json(budgets);
+    return res.json(budgets);
   } catch (error) {
     console.error('Get budgets error:', error);
-    res.status(500).json({ error: 'Failed to fetch budgets' });
+    return res.status(500).json({ error: 'Failed to fetch budgets' });
   }
 };
 
@@ -56,10 +56,10 @@ export const createBudget = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.status(201).json(budget);
+    return res.status(201).json(budget);
   } catch (error) {
     console.error('Create budget error:', error);
-    res.status(500).json({ error: 'Failed to create budget' });
+    return res.status(500).json({ error: 'Failed to create budget' });
   }
 };
 
@@ -70,7 +70,7 @@ export const updateBudget = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId;
     const { id } = req.params;
-    const { name, category, limit, spent, color, icon, alertThreshold } = req.body;
+    const { name, category, limit, spent, color, icon, alertThreshold, followed } = req.body;
 
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
@@ -86,19 +86,20 @@ export const updateBudget = async (req: AuthRequest, res: Response) => {
       where: { id },
       data: {
         ...(name && { name }),
-        ...(category && { category }),
+        ...(category !== undefined && { category }),
         ...(limit && { limit: parseFloat(limit) }),
         ...(spent !== undefined && { spent: parseFloat(spent) }),
         ...(color && { color }),
-        ...(icon && { icon }),
-        ...(alertThreshold && { alertThreshold }),
+        ...(icon !== undefined && { icon }),
+        ...(alertThreshold !== undefined && { alertThreshold }),
+        ...(followed !== undefined && { followed: Boolean(followed) }),
       },
     });
 
-    res.json(updated);
+    return res.json(updated);
   } catch (error) {
     console.error('Update budget error:', error);
-    res.status(500).json({ error: 'Failed to update budget' });
+    return res.status(500).json({ error: 'Failed to update budget' });
   }
 };
 
@@ -122,9 +123,9 @@ export const deleteBudget = async (req: AuthRequest, res: Response) => {
 
     await prisma.budget.delete({ where: { id } });
 
-    res.json({ message: 'Budget deleted' });
+    return res.json({ message: 'Budget deleted' });
   } catch (error) {
     console.error('Delete budget error:', error);
-    res.status(500).json({ error: 'Failed to delete budget' });
+    return res.status(500).json({ error: 'Failed to delete budget' });
   }
 };

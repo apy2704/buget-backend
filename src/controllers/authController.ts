@@ -46,7 +46,7 @@ export const register = async (req: AuthRequest, res: Response) => {
     // Generate token
     const token = generateToken(user.id);
 
-    res.status(201).json({
+    return res.status(201).json({
       message: 'User registered successfully',
       token,
       user: {
@@ -57,7 +57,7 @@ export const register = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error('Register error:', error);
-    res.status(500).json({ error: 'Failed to register user' });
+    return res.status(500).json({ error: 'Failed to register user' });
   }
 };
 
@@ -91,7 +91,7 @@ export const login = async (req: AuthRequest, res: Response) => {
     // Generate token
     const token = generateToken(user.id);
 
-    res.json({
+    return res.json({
       message: 'Login successful',
       token,
       user: {
@@ -102,7 +102,7 @@ export const login = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Login failed' });
+    return res.status(500).json({ error: 'Login failed' });
   }
 };
 
@@ -128,7 +128,7 @@ export const getProfile = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    res.json({
+    return res.json({
       id: user.id,
       email: user.email,
       name: user.name,
@@ -137,7 +137,7 @@ export const getProfile = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error('Get profile error:', error);
-    res.status(500).json({ error: 'Failed to fetch profile' });
+    return res.status(500).json({ error: 'Failed to fetch profile' });
   }
 };
 
@@ -161,7 +161,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json({
+    return res.json({
       message: 'Profile updated',
       user: {
         id: user.id,
@@ -172,6 +172,6 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error('Update profile error:', error);
-    res.status(500).json({ error: 'Failed to update profile' });
+    return res.status(500).json({ error: 'Failed to update profile' });
   }
 };

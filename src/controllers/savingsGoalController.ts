@@ -24,10 +24,10 @@ export const getSavingsGoals = async (req: AuthRequest, res: Response) => {
           : 0,
     }));
 
-    res.json(goalsWithProgress);
+    return res.json(goalsWithProgress);
   } catch (error) {
     console.error('Get savings goals error:', error);
-    res.status(500).json({ error: 'Failed to fetch savings goals' });
+    return res.status(500).json({ error: 'Failed to fetch savings goals' });
   }
 };
 
@@ -72,10 +72,10 @@ export const createSavingsGoal = async (req: AuthRequest, res: Response) => {
 
     const progress = Number(goal.targetAmount) > 0 ? (Number(goal.currentAmount) / Number(goal.targetAmount)) * 100 : 0;
 
-    res.status(201).json({ ...goal, progress });
+    return res.status(201).json({ ...goal, progress });
   } catch (error) {
     console.error('Create savings goal error:', error);
-    res.status(500).json({ error: 'Failed to create savings goal' });
+    return res.status(500).json({ error: 'Failed to create savings goal' });
   }
 };
 
@@ -116,10 +116,10 @@ export const updateSavingsGoal = async (req: AuthRequest, res: Response) => {
       ? (Number(updatedGoal.currentAmount) / Number(updatedGoal.targetAmount)) * 100
       : 0;
 
-    res.json({ ...updated, progress });
+    return res.json({ ...updated, progress });
   } catch (error) {
     console.error('Update savings goal error:', error);
-    res.status(500).json({ error: 'Failed to update savings goal' });
+    return res.status(500).json({ error: 'Failed to update savings goal' });
   }
 };
 
@@ -160,14 +160,14 @@ export const contributeSavingsGoal = async (req: AuthRequest, res: Response) => 
 
     const progress = Number(updated.targetAmount) > 0 ? (Number(updated.currentAmount) / Number(updated.targetAmount)) * 100 : 0;
 
-    res.json({
+    return res.json({
       ...updated,
       progress,
       isComplete,
     });
   } catch (error) {
     console.error('Contribute savings goal error:', error);
-    res.status(500).json({ error: 'Failed to contribute to savings goal' });
+    return res.status(500).json({ error: 'Failed to contribute to savings goal' });
   }
 };
 
@@ -204,10 +204,10 @@ export const withdrawSavingsGoal = async (req: AuthRequest, res: Response) => {
 
     const progress = Number(updated.targetAmount) > 0 ? (Number(updated.currentAmount) / Number(updated.targetAmount)) * 100 : 0;
 
-    res.json({ ...updated, progress });
+    return res.json({ ...updated, progress });
   } catch (error) {
     console.error('Withdraw savings goal error:', error);
-    res.status(500).json({ error: 'Failed to withdraw from savings goal' });
+    return res.status(500).json({ error: 'Failed to withdraw from savings goal' });
   }
 };
 
@@ -231,9 +231,9 @@ export const deleteSavingsGoal = async (req: AuthRequest, res: Response) => {
 
     await prisma.savingsGoal.delete({ where: { id } });
 
-    res.json({ message: 'Savings goal deleted' });
+    return res.json({ message: 'Savings goal deleted' });
   } catch (error) {
     console.error('Delete savings goal error:', error);
-    res.status(500).json({ error: 'Failed to delete savings goal' });
+    return res.status(500).json({ error: 'Failed to delete savings goal' });
   }
 };

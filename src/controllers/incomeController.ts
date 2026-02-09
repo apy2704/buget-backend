@@ -29,13 +29,13 @@ export const getIncomes = async (req: AuthRequest, res: Response) => {
       where: { userId, ...(source && { source }) },
     });
 
-    res.json({
+    return res.json({
       incomes,
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     });
   } catch (error) {
     console.error('Get incomes error:', error);
-    res.status(500).json({ error: 'Failed to fetch incomes' });
+    return res.status(500).json({ error: 'Failed to fetch incomes' });
   }
 };
 
@@ -70,26 +70,23 @@ export const createIncome = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    // Update account totals
-    const account = await prisma.account.findUnique({ where: { userId } });
-    if (account) {
-      await prisma.account.update({
-        where: { userId },
-        data: {
-          totalIncome: {
-            increment: parsedAmount,
-          },
-          totalBalance: {
-            increment: parsedAmount,
-          },
-        },
-      });
+    // Update account totals (create account if missing for existing users)
+    let account = await prisma.account.findUnique({ where: { userId } });
+    if (!account) {
+      account = await prisma.account.create({ data: { userId } });
     }
+    await prisma.account.update({
+      where: { userId },
+      data: {
+        totalIncome: { increment: parsedAmount },
+        totalBalance: { increment: parsedAmount },
+      },
+    });
 
-    res.status(201).json(income);
+    return res.status(201).json(income);
   } catch (error) {
     console.error('Create income error:', error);
-    res.status(500).json({ error: 'Failed to create income' });
+    return res.status(500).json({ error: 'Failed to create income' });
   }
 };
 
@@ -129,10 +126,10 @@ export const updateIncome = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json(updated);
+    return res.json(updated);
   } catch (error) {
     console.error('Update income error:', error);
-    res.status(500).json({ error: 'Failed to update income' });
+    return res.status(500).json({ error: 'Failed to update income' });
   }
 };
 
@@ -172,9 +169,9 @@ export const deleteIncome = async (req: AuthRequest, res: Response) => {
 
     await prisma.income.delete({ where: { id } });
 
-    res.json({ message: 'Income deleted' });
+    return res.json({ message: 'Income deleted' });
   } catch (error) {
     console.error('Delete income error:', error);
-    res.status(500).json({ error: 'Failed to delete income' });
+    return res.status(500).json({ error: 'Failed to delete income' });
   }
 };

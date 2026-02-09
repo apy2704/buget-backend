@@ -39,7 +39,7 @@ export const authMiddleware = (
  */
 export const optionalAuthMiddleware = (
   req: AuthRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void => {
   try {

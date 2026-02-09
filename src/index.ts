@@ -67,7 +67,7 @@ app.use('/api/cards', cardRoutes);
 app.use('/api/savings', savingsGoalRoutes);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
@@ -78,7 +78,7 @@ app.use((req, res) => {
 });
 
 // Error handling middleware
-app.use((err: any, req: any, res: any, next: any) => {
+app.use((err: any, req: any, res: any, _next: any) => {
   // log the error
   void logError(err, req).catch(() => {});
   res.status(err.status || 500).json({
